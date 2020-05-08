@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/:id/comments', (req, res) => {
+router.post('/:id/comments', async (req, res) => {
   const { text } = req.body;
   const { id } = req.params;
 
@@ -38,6 +38,14 @@ router.post('/:id/comments', (req, res) => {
       .status(400)
       .json({ errorMessage: 'Please provide text for the comment.' });
   } else {
+    try {
+    } catch (err) {
+      res
+        .status(500)
+        .json({
+          error: 'There was an error while saving the comment to the database.',
+        });
+    }
   }
 });
 
