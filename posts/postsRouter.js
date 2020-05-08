@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   insert,
+  remove,
   find,
   findById,
   findPostComments,
@@ -109,6 +110,26 @@ router.get('/:id/comments', async (req, res) => {
     res
       .status(500)
       .json({ error: 'The comments information could not be retrieved.' });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const found = await findById(id);
+
+    if (found.length) {
+      await remove(id);
+
+      res.status(200).json({ removed: found[0] });
+    } else {
+      res
+        .status(404)
+        .json({ message: 'The post with the specified ID does not exist.' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'The post could not be removed.' });
   }
 });
 
