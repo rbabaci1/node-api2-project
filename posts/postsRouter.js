@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { insert, find, findById } = require('../data/db');
+const {
+  insert,
+  find,
+  findById,
+  insertComment,
+  findCommentById,
+} = require('../data/db');
 
 // router.get('/', async (req, res) => {
 //   const posts = await find();
@@ -30,21 +36,31 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/:id/comments', async (req, res) => {
-  const { text } = req.body;
+  const comment = req.body;
   const { id } = req.params;
 
-  if (!text) {
+  if (!comment.text) {
     res
       .status(400)
       .json({ errorMessage: 'Please provide text for the comment.' });
   } else {
     try {
+      const found = await findById(id);
+
+      if (found) {
+        const { id } = await insertComment(comment);
+        const addedComment = findCommentById(id);
+
+        res.status(201).json(addedComment);
+      } else {
+        res
+          .status(404)
+          .json({ message: 'The post with the specified ID does not exist.' });
+      }
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          error: 'There was an error while saving the comment to the database.',
-        });
+      res.status(500).json({
+        error: 'There was an error while saving the comment to the database.',
+      });
     }
   }
 });
