@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   insert,
   remove,
+  update,
   find,
   findById,
   findPostComments,
@@ -130,6 +131,36 @@ router.delete('/:id', async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ error: 'The post could not be removed.' });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+
+  if (!changes.title || !changes.contents) {
+    res.status(400).json({
+      errorMessage: 'Please provide title and contents for the post.',
+    });
+  } else {
+    try {
+      const found = await findById(id);
+
+      if (found.length) {
+        await update(id, changes);
+        const updatedPost = await findById(id);
+
+        res.status(200).json(updatedPost[0]);
+      } else {
+        res
+          .status(404)
+          .json({ message: 'The post with the specified ID does not exist.' });
+      }
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: 'The post information could not be modified.' });
+    }
   }
 });
 
