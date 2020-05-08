@@ -8,11 +8,11 @@ const {
   findCommentById,
 } = require('../data/db');
 
-// router.get('/', async (req, res) => {
-//   const posts = await find();
+router.get('/', async (req, res) => {
+  const posts = await find();
 
-//   res.status(200).json(posts);
-// });
+  res.status(200).json(posts);
+});
 
 router.post('/', async (req, res) => {
   const post = req.body;
@@ -36,8 +36,8 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/:id/comments', async (req, res) => {
-  const comment = req.body;
   const { id } = req.params;
+  const comment = { ...req.body, post_id: id };
 
   if (!comment.text) {
     res
@@ -47,9 +47,9 @@ router.post('/:id/comments', async (req, res) => {
     try {
       const found = await findById(id);
 
-      if (found) {
+      if (found.length) {
         const { id } = await insertComment(comment);
-        const addedComment = findCommentById(id);
+        const addedComment = await findCommentById(id);
 
         res.status(201).json(addedComment);
       } else {
