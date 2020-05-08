@@ -8,12 +8,6 @@ const {
   findCommentById,
 } = require('../data/db');
 
-router.get('/', async (req, res) => {
-  const posts = await find();
-
-  res.status(200).json(posts);
-});
-
 router.post('/', async (req, res) => {
   const post = req.body;
 
@@ -62,6 +56,18 @@ router.post('/:id/comments', async (req, res) => {
         error: 'There was an error while saving the comment to the database.',
       });
     }
+  }
+});
+
+router.get('/', async (req, res) => {
+  try {
+    const posts = await find();
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'The posts information could not be retrieved.' });
   }
 });
 
